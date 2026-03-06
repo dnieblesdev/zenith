@@ -20,10 +20,23 @@ export interface Chapter {
 }
 
 /**
+ * A single paragraph from a chapter, potentially with an applied correction.
+ * `isCorrected` is true when the text reflects a community-applied Correction
+ * rather than the raw content from chapter.content.
+ */
+export interface Paragraph {
+  index: number;
+  text: string;
+  isCorrected: boolean;
+}
+
+/**
  * Full chapter including parsed paragraphs (server-side split of content).
- * `paragraphs` is an ordered array of raw paragraph strings from chapter.content.
- * The reader renders these alongside any active Corrections.
+ * `paragraphs` is an ordered array of Paragraph objects.
+ * Each paragraph's text may reflect a community correction if one has been applied.
+ * `contentAvailable` is false when the chapter has no parseable content yet.
  */
 export interface ChapterDetail extends Chapter {
-  paragraphs: string[];
+  paragraphs: Paragraph[];
+  contentAvailable: boolean;
 }

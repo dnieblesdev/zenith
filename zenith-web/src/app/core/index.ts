@@ -25,7 +25,7 @@ export type {
 } from './models/novel.model';
 
 // Models — Chapter domain
-export type { Chapter, ChapterDetail } from './models/chapter.model';
+export type { Chapter, ChapterDetail, Paragraph } from './models/chapter.model';
 
 // Models — User domain
 export type { User, UserSummary, UserRole } from './models/user.model';

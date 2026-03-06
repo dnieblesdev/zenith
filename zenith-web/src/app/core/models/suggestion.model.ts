@@ -21,6 +21,7 @@ export interface Suggestion {
   proposedText: string;
   status: SuggestionStatus;
   voteCount: number;
+  note: string | null;
   user: UserSummary;
   createdAt: string;
   updatedAt: string;
