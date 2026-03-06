@@ -150,3 +150,77 @@ export type ListNovelsParams = {
   status?: string
   q?: string
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Editorial types
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const SUGGESTION_STATUS = {
+  PENDING: 'PENDING',
+  APPLIED: 'APPLIED',
+  REJECTED: 'REJECTED',
+  SUPERSEDED: 'SUPERSEDED',
+} as const
+
+export type SuggestionStatus = (typeof SUGGESTION_STATUS)[keyof typeof SUGGESTION_STATUS]
+
+export type SuggestionUserSummary = {
+  id: number
+  username: string
+}
+
+export type SuggestionListItem = {
+  id: number
+  chapterId: number
+  novelId: number
+  userId: number
+  paragraphIndex: number
+  originalText: string
+  proposedText: string
+  status: SuggestionStatus
+  voteCount: number
+  user: SuggestionUserSummary
+  createdAt: Date
+  updatedAt: Date
+}
+
+export type SuggestionDetail = {
+  id: number
+  chapterId: number
+  novelId: number
+  userId: number
+  paragraphIndex: number
+  originalText: string
+  proposedText: string
+  status: SuggestionStatus
+  voteCount: number
+  user: SuggestionUserSummary
+  createdAt: Date
+  updatedAt: Date
+}
+
+export type VoteResult = {
+  suggestionId: number
+  voteCount: number
+  applied: boolean
+}
+
+export type UnvoteResult = {
+  suggestionId: number
+  voteCount: number
+}
+
+export type CreateSuggestionParams = {
+  chapterId: number
+  paragraphIndex: number
+  originalText: string
+  proposedText: string
+  language?: string
+}
+
+export type ListSuggestionsParams = {
+  paragraphIndex?: number
+  status?: SuggestionStatus
+  page?: number
+  limit?: number
+}
