@@ -1,0 +1,7 @@
+playwright
+pydantic
+pytest
+loguru
+pymysql
+python-dotenv
+prisma

@@ -1,0 +1,10 @@
+{
+  "name": "zenith-web",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "echo \"zenith-web dev not yet configured\"",
+    "build": "echo \"zenith-web build not yet configured\"",
+    "test": "echo \"zenith-web test not yet configured\"",
+    "typecheck": "echo \"zenith-web typecheck not yet configured\""
+  }
+}

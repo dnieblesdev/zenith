@@ -1,0 +1,26 @@
+{
+  "name": "zenith-api",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "bun run --hot src/index.ts",
+    "start": "bun run src/index.ts",
+    "build": "bunx tsc --noEmit",
+    "typecheck": "bunx tsc --noEmit",
+    "test": "bunx vitest run"
+  },
+  "dependencies": {
+    "@better-auth/prisma-adapter": "^1.5.4",
+    "@hono/zod-validator": "^0.4.0",
+    "@prisma/client": "^5.22.0",
+    "better-auth": "^1.0.0",
+    "hono": "^4.6.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "@types/bun": "latest",
+    "vitest": "^2.1.0",
+    "prisma": "^5.22.0"
+  }
+}

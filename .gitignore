@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build output
+dist/
+**/dist/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Bun lockfile (binary — bun <1.2 format, ignored; bun.lock text format is committed)
+bun.lockb
+
+# Prisma generated clients
+# Python client (prisma-client-py output → zenith-scrapper/src/prisma/)
+zenith-scrapper/src/prisma/
+zenith-api/node_modules/.prisma/
+**/node_modules/.prisma/
+
+# Angular build output
+zenith-web/.angular/
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
