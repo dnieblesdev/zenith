@@ -918,6 +918,7 @@ describe('AP-023 DELETE /suggestions/:id/vote', () => {
 describe('AP-024 GET /suggestions/:id', () => {
   beforeEach(() => {
     vi.resetAllMocks()
+    restoreAuthMock()
   })
 
   it('returns 200 with suggestion detail', async () => {
