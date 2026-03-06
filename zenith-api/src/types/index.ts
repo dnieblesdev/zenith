@@ -1,10 +1,33 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Auth types
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const USER_ROLE = {
+  READER: 'READER',
+  EDITOR: 'EDITOR',
+  ADMIN: 'ADMIN',
+} as const
+
+export type UserRole = (typeof USER_ROLE)[keyof typeof USER_ROLE]
+
+export type AuthUser = {
+  id: number
+  username: string
+  email: string
+  role: UserRole
+}
+
 export type Variables = {
-  user: {
-    id: string
-    email: string
-    name: string | null
-    role: string
-  }
+  user: AuthUser
+}
+
+export type UserProfile = {
+  id: number
+  username: string
+  role: UserRole
+  acceptedCount: number
+  suggestionsCount: number
+  createdAt: Date
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
