@@ -150,6 +150,7 @@ model Suggestion {
   paragraphIndex Int              @map("paragraph_index")
   originalText   String           @db.Text @map("original_text")
   proposedText   String           @db.Text @map("proposed_text")
+  note           String?          @db.VarChar(500) @map("note")
   status         SuggestionStatus @default(PENDING) @map("status")
   voteCount      Int              @default(0) @map("vote_count")
   chapter        Chapter          @relation(fields: [chapterId], references: [id], onDelete: Cascade)

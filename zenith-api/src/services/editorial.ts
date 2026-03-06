@@ -42,6 +42,7 @@ type SuggestionRow = {
   paragraphIndex: number
   originalText: string
   proposedText: string
+  note: string | null
   status: string
   voteCount: number
   user: { id: number; username: string }
@@ -143,6 +144,7 @@ export async function createSuggestion(
       paragraphIndex: params.paragraphIndex,
       originalText: params.originalText,
       proposedText: params.proposedText,
+      note: params.note ?? null,
       status: 'PENDING',
       voteCount: 0,
     },
@@ -154,6 +156,7 @@ export async function createSuggestion(
       paragraphIndex: true,
       originalText: true,
       proposedText: true,
+      note: true,
       status: true,
       voteCount: true,
       user: { select: { id: true, username: true } },
@@ -170,6 +173,7 @@ export async function createSuggestion(
     paragraphIndex: row.paragraphIndex,
     originalText: row.originalText,
     proposedText: row.proposedText,
+    note: row.note,
     status: row.status as SuggestionDetail['status'],
     voteCount: row.voteCount,
     user: { id: row.user.id, username: row.user.username },
@@ -220,6 +224,7 @@ export async function listSuggestions(
         paragraphIndex: true,
         originalText: true,
         proposedText: true,
+        note: true,
         status: true,
         voteCount: true,
         user: { select: { id: true, username: true } },
@@ -238,6 +243,7 @@ export async function listSuggestions(
     paragraphIndex: row.paragraphIndex,
     originalText: row.originalText,
     proposedText: row.proposedText,
+    note: row.note,
     status: row.status as SuggestionListItem['status'],
     voteCount: row.voteCount,
     user: { id: row.user.id, username: row.user.username } as SuggestionUserSummary,
@@ -391,6 +397,7 @@ export async function getSuggestion(id: number): Promise<SingleResponse<Suggesti
       paragraphIndex: true,
       originalText: true,
       proposedText: true,
+      note: true,
       status: true,
       voteCount: true,
       user: { select: { id: true, username: true } },
@@ -411,6 +418,7 @@ export async function getSuggestion(id: number): Promise<SingleResponse<Suggesti
     paragraphIndex: row.paragraphIndex,
     originalText: row.originalText,
     proposedText: row.proposedText,
+    note: row.note,
     status: row.status as SuggestionDetail['status'],
     voteCount: row.voteCount,
     user: { id: row.user.id, username: row.user.username },

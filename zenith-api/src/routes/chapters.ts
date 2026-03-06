@@ -54,7 +54,11 @@ chapters.post(
       paragraphIndex: z.number().int().min(0),
       originalText: z.string().min(1),
       proposedText: z.string().min(1),
+      note: z.string().max(500).optional(),
       language: z.string().optional(),
+    }).refine((b) => b.proposedText !== b.originalText, {
+      message: 'proposedText must differ from originalText',
+      path: ['proposedText'],
     }),
   ),
   async (c) => {
@@ -68,6 +72,7 @@ chapters.post(
         paragraphIndex: body.paragraphIndex,
         originalText: body.originalText,
         proposedText: body.proposedText,
+        note: body.note,
         language: body.language,
       },
       user.id,

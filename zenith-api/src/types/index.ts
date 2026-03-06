@@ -177,6 +177,7 @@ export type SuggestionListItem = {
   paragraphIndex: number
   originalText: string
   proposedText: string
+  note: string | null
   status: SuggestionStatus
   voteCount: number
   user: SuggestionUserSummary
@@ -192,6 +193,7 @@ export type SuggestionDetail = {
   paragraphIndex: number
   originalText: string
   proposedText: string
+  note: string | null
   status: SuggestionStatus
   voteCount: number
   user: SuggestionUserSummary
@@ -215,6 +217,7 @@ export type CreateSuggestionParams = {
   paragraphIndex: number
   originalText: string
   proposedText: string
+  note?: string
   language?: string
 }
 

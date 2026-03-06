@@ -109,6 +109,7 @@ function makeSuggestionRow(overrides: Record<string, unknown> = {}) {
     paragraphIndex: 3,
     originalText: 'Original text here.',
     proposedText: 'Proposed improvement here.',
+    note: null,
     status: 'PENDING',
     voteCount: 0,
     user: { id: 5, username: 'testuser' },
@@ -651,6 +652,54 @@ describe('AP-020 POST /chapters/:id/suggestions', () => {
     )
 
     expect(res.status).toBe(404)
+  })
+
+  it('returns 400 when proposedText equals originalText', async () => {
+    const res = await app.request(
+      '/chapters/1/suggestions',
+      jsonBody({
+        paragraphIndex: 0,
+        originalText: 'Same text.',
+        proposedText: 'Same text.',
+      }),
+    )
+
+    expect(res.status).toBe(400)
+  })
+
+  it('accepts optional note field and includes it in response', async () => {
+    vi.mocked(db.chapter.findUnique).mockResolvedValueOnce(makeChapterRow() as never)
+    vi.mocked(db.suggestion.create).mockResolvedValueOnce(
+      makeSuggestionRow({ note: 'This word is more precise here.' }) as never,
+    )
+
+    const res = await app.request(
+      '/chapters/1/suggestions',
+      jsonBody({
+        paragraphIndex: 3,
+        originalText: 'Original text here.',
+        proposedText: 'Proposed improvement here.',
+        note: 'This word is more precise here.',
+      }),
+    )
+
+    expect(res.status).toBe(201)
+    const body = await res.json()
+    expect(body.data.note).toBe('This word is more precise here.')
+  })
+
+  it('returns 400 when note exceeds 500 characters', async () => {
+    const res = await app.request(
+      '/chapters/1/suggestions',
+      jsonBody({
+        paragraphIndex: 0,
+        originalText: 'A',
+        proposedText: 'B',
+        note: 'x'.repeat(501),
+      }),
+    )
+
+    expect(res.status).toBe(400)
   })
 })
 
