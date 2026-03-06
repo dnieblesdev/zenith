@@ -227,3 +227,56 @@ export type ListSuggestionsParams = {
   page?: number
   limit?: number
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Admin types
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type AdminNovelInput = {
+  title: string
+  url: string
+  slug: string
+  language: 'en' | 'es'
+  description?: string
+  coverUrl?: string
+  status?: string
+}
+
+export type AdminUpdateNovelInput = {
+  title?: string
+  description?: string
+  coverUrl?: string | null | undefined
+  status?: string
+  language?: 'en' | 'es'
+}
+
+export type AdminSyncResult = {
+  novelId: number
+  queued: boolean
+  message: string
+}
+
+export type AdminStatusOverrideResult = {
+  id: number
+  status: SuggestionStatus
+  chapterId: number
+  paragraphIndex: number
+  voteCount: number
+  correctionCreated: boolean
+  correctionSuperseded: boolean
+}
+
+export type AdminStats = {
+  novels: number
+  chapters: number
+  users: number
+  suggestions: {
+    total: number
+    pending: number
+    applied: number
+    rejected: number
+    superseded: number
+  }
+  corrections: number
+  votes: number
+}
