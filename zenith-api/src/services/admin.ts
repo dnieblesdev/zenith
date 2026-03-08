@@ -1,8 +1,8 @@
 import { HTTPException } from 'hono/http-exception'
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
+import { PrismaClientKnownRequestError } from '../generated/prisma/runtime/library'
 import { db } from '../lib/db'
 import { notFound } from '../lib/errors'
-import type { Prisma } from '@prisma/client'
+import type { Prisma } from '../generated/prisma'
 import type {
   AdminNovelInput,
   AdminUpdateNovelInput,
@@ -277,6 +277,7 @@ export async function getStats(): Promise<AdminStats> {
     db.suggestion.groupBy({
       by: ['status'],
       _count: { _all: true },
+      orderBy: { status: 'asc' },
     }),
     db.correction.count(),
     db.vote.count(),

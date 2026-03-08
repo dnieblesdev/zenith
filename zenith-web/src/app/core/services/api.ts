@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { map } from 'rxjs/operators';
 
-import type { Novel, NovelSummary, NovelQueryParams, PaginatedResponse } from '../models/novel.model';
+import type { Novel, NovelSummary, NovelQueryParams, PaginatedResponse, SingleResponse } from '../models/novel.model';
 import type { Chapter, ChapterDetail } from '../models/chapter.model';
 import type { Suggestion } from '../models/suggestion.model';
 
@@ -31,17 +32,23 @@ export class ApiService {
   }
 
   getNovel(slug: string) {
-    return this.http.get<Novel>(`${this.base}/novels/${slug}`);
+    return this.http.get<SingleResponse<Novel>>(`${this.base}/novels/${slug}`).pipe(
+      map(res => res.data)
+    );
   }
 
   // ---- Chapters --------------------------------------------------------------
 
-  getChapters(novelId: number) {
-    return this.http.get<Chapter[]>(`${this.base}/novels/${novelId}/chapters`);
+  getChapters(novelSlug: string) {
+    return this.http.get<SingleResponse<Chapter[]>>(`${this.base}/novels/${novelSlug}/chapters`).pipe(
+      map(res => res.data)
+    );
   }
 
   getChapter(chapterId: number) {
-    return this.http.get<ChapterDetail>(`${this.base}/chapters/${chapterId}`);
+    return this.http.get<SingleResponse<ChapterDetail>>(`${this.base}/chapters/${chapterId}`).pipe(
+      map(res => res.data)
+    );
   }
 
   // ---- Suggestions & Votes ---------------------------------------------------

@@ -20,13 +20,13 @@ app.get('/health', (c) => {
   return c.json({ status: 'ok' })
 })
 
-// Routes
-app.route('/novels', novels)
-app.route('/chapters', chapters)
-app.route('/suggestions', suggestions)
-app.route('/admin', admin)
-app.route('/auth', authRoutes)
-app.route('/users', usersRouter)
+// Routes — mounted under /api to match production same-origin setup
+app.route('/api/novels', novels)
+app.route('/api/chapters', chapters)
+app.route('/api/suggestions', suggestions)
+app.route('/api/admin', admin)
+app.route('/api/auth', authRoutes)
+app.route('/api/users', usersRouter)
 
 // Bun server export
 const port = Number(process.env.PORT) || 3000

@@ -15,7 +15,7 @@ import type {
 // Typed intermediates — avoid implicit `any` in map/filter callbacks
 // ─────────────────────────────────────────────────────────────────────────────
 
-type GenreRelation = { genre: { name: string } }
+type GenreRelation = { genre: { id: number; name: string } }
 type GenreDetailRelation = { genre: { id: number; name: string } }
 
 type NovelRow = {
@@ -112,7 +112,7 @@ export async function listNovels(
       orderBy: { updatedAt: 'desc' },
       include: {
         author: { select: { id: true, name: true } },
-        genres: { include: { genre: { select: { name: true } } } },
+        genres: { include: { genre: { select: { id: true, name: true } } } },
         _count: { select: { chapters: true } },
       },
     }),
@@ -130,7 +130,7 @@ export async function listNovels(
     author: novel.author
       ? { id: novel.author.id, name: novel.author.name }
       : null,
-    genres: novel.genres.map((ng: GenreRelation) => ng.genre.name),
+    genres: novel.genres.map((ng: GenreRelation) => ({ id: ng.genre.id, name: ng.genre.name })),
     chapterCount: novel._count.chapters,
     createdAt: novel.createdAt,
     updatedAt: novel.updatedAt,
@@ -145,11 +145,11 @@ export async function listNovels(
 // AP-002 — getNovel
 // ─────────────────────────────────────────────────────────────────────────────
 
-export async function getNovel(id: number): Promise<SingleResponse<NovelDetail>> {
+export async function getNovel(slug: string): Promise<SingleResponse<NovelDetail>> {
   let novel: NovelDetailRow
   try {
     novel = (await db.novel.findUniqueOrThrow({
-      where: { id },
+      where: { slug },
       include: {
         author: { select: { id: true, name: true, description: true } },
         genres: { include: { genre: { select: { id: true, name: true } } } },
@@ -193,14 +193,16 @@ export async function getNovel(id: number): Promise<SingleResponse<NovelDetail>>
 // ─────────────────────────────────────────────────────────────────────────────
 
 export async function listChapters(
-  novelId: number,
+  novelSlug: string,
 ): Promise<ListResponse<ChapterListItem>> {
   // Verify novel exists first
+  let novelId: number
   try {
-    await db.novel.findUniqueOrThrow({
-      where: { id: novelId },
+    const novel = await db.novel.findUniqueOrThrow({
+      where: { slug: novelSlug },
       select: { id: true },
     })
+    novelId = novel.id
   } catch {
     throw notFound('Novel not found')
   }

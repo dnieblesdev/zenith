@@ -93,7 +93,7 @@ export type NovelListItem = {
   language: string
   reads: number
   author: AuthorSummary | null
-  genres: string[]
+  genres: GenreSummary[]
   chapterCount: number
   createdAt: Date
   updatedAt: Date

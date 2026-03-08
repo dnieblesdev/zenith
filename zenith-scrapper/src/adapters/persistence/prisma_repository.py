@@ -154,6 +154,7 @@ class PrismaNovelRepository(RepositoryPort):
             # Build create data
             create_data = {
                 "title": novel.title,
+                "slug": novel.slug,
                 "url": novel.url,
                 "description": novel.description,
                 "status": novel.status,

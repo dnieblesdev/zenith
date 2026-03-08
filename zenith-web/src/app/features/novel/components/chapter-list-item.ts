@@ -21,7 +21,7 @@ import type { Chapter } from '../../../core/models/chapter.model';
           {{ chapter().title }}
         </span>
         <span class="text-xs text-slate-500">
-          Ch. {{ chapter().orderIndex + 1 }}
+          Ch. {{ chapter().orderIndex }}
         </span>
       </div>
       <span class="text-xs text-slate-500 shrink-0 ml-4">

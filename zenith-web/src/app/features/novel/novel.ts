@@ -178,7 +178,7 @@ export class NovelComponent {
       next: (novel) => {
         this.novel.set(novel);
         this.loading.set(false);
-        this.fetchChapters(novel.id);
+        this.fetchChapters(slug);
       },
       error: () => {
         this.error.set(true);
@@ -187,9 +187,9 @@ export class NovelComponent {
     });
   }
 
-  private fetchChapters(novelId: number) {
+  private fetchChapters(novelSlug: string) {
     this.chaptersLoading.set(true);
-    this.api.getChapters(novelId).subscribe({
+    this.api.getChapters(novelSlug).subscribe({
       next: (chapters) => {
         this.chapters.set(chapters);
         this.chaptersLoading.set(false);

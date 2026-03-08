@@ -1,11 +1,11 @@
 import { RenderMode, ServerRoute } from '@angular/ssr';
 
 export const serverRoutes: ServerRoute[] = [
-  // Static routes — safe to prerender (no dynamic params)
-  { path: '', renderMode: RenderMode.Prerender },
-  { path: 'login', renderMode: RenderMode.Prerender },
-  { path: 'register', renderMode: RenderMode.Prerender },
-  { path: 'novels', renderMode: RenderMode.Prerender },
+  // Static routes — SSR (workaround: Prerender + zoneless causes NG0401 in Angular 19.2.x)
+  { path: '', renderMode: RenderMode.Server },
+  { path: 'login', renderMode: RenderMode.Server },
+  { path: 'register', renderMode: RenderMode.Server },
+  { path: 'novels', renderMode: RenderMode.Server },
 
   // Dynamic routes — render on each server request
   { path: 'novels/:slug', renderMode: RenderMode.Server },

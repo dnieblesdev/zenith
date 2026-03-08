@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest'
 
 // Type alias for Prisma-style transaction callbacks used in mocks
-type TxFn<T> = (tx: unknown) => Promise<T>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type TxFn<T> = (tx: any) => Promise<T>
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Mock DB — must be before imports that use db

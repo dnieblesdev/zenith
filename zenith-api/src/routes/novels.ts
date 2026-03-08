@@ -28,19 +28,19 @@ novels.get(
   },
 )
 
-// AP-002 GET /novels/:id
+// AP-002 GET /novels/:slug
 novels.get(
-  '/:id',
+  '/:slug',
   zValidator(
     'param',
     z.object({
-      id: z.coerce.number().int().positive(),
+      slug: z.string().min(1),
     }),
   ),
   async (c) => {
-    const { id } = c.req.valid('param')
+    const { slug } = c.req.valid('param')
     try {
-      const result = await getNovel(id)
+      const result = await getNovel(slug)
       return c.json(result)
     } catch (e) {
       if (e instanceof HTTPException) throw e
@@ -49,19 +49,19 @@ novels.get(
   },
 )
 
-// AP-003 GET /novels/:id/chapters
+// AP-003 GET /novels/:slug/chapters
 novels.get(
-  '/:id/chapters',
+  '/:slug/chapters',
   zValidator(
     'param',
     z.object({
-      id: z.coerce.number().int().positive(),
+      slug: z.string().min(1),
     }),
   ),
   async (c) => {
-    const { id } = c.req.valid('param')
+    const { slug } = c.req.valid('param')
     try {
-      const result = await listChapters(id)
+      const result = await listChapters(slug)
       return c.json(result)
     } catch (e) {
       if (e instanceof HTTPException) throw e

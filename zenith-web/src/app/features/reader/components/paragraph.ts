@@ -11,19 +11,26 @@ import type { Paragraph } from '../../../core/models/chapter.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <p
-      class="text-base leading-relaxed text-slate-200 cursor-pointer rounded px-1 -mx-1 transition-colors hover:bg-slate-700/40 relative"
-      [class.border-l-2]="paragraph().isCorrected"
-      [class.border-brand-secondary]="paragraph().isCorrected"
-      [class.pl-3]="paragraph().isCorrected"
-      (click)="clicked.emit(paragraph())"
+      [class]="paragraphClass()"
+      (click)="onParagraphClick()"
     >
       {{ paragraph().text }}
+
       @if (paragraph().isCorrected) {
         <span
-          class="inline-flex items-center ml-1.5 px-1 py-0.5 rounded text-xs bg-brand-secondary/20 text-brand-secondary align-middle"
+          class="inline-flex items-center ml-2 px-1.5 py-0.5 rounded-full text-xs font-medium bg-brand-secondary/10 text-brand-secondary align-middle leading-none"
           title="Community correction applied"
         >
-          ✓
+          ✓ edited
+        </span>
+      }
+
+      <!-- "Suggest" hint: only visible on hover when suggest is enabled -->
+      @if (suggestEnabled()) {
+        <span
+          class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+        >
+          suggest
         </span>
       }
     </p>
@@ -31,5 +38,23 @@ import type { Paragraph } from '../../../core/models/chapter.model';
 })
 export class ParagraphComponent {
   readonly paragraph = input.required<Paragraph>();
+  readonly suggestEnabled = input<boolean>(true);
   readonly clicked = output<Paragraph>();
+
+  paragraphClass(): string {
+    const base = 'group relative rounded-sm -mx-3 px-3 py-0.5 transition-colors duration-200 select-none';
+    const interactive = this.suggestEnabled()
+      ? 'cursor-pointer hover:bg-slate-800/60'
+      : 'cursor-default';
+    const corrected = this.paragraph().isCorrected
+      ? 'pl-4 border-l-2 border-brand-secondary'
+      : '';
+    return `${base} ${interactive} ${corrected}`.trim();
+  }
+
+  onParagraphClick(): void {
+    if (this.suggestEnabled()) {
+      this.clicked.emit(this.paragraph());
+    }
+  }
 }

@@ -16,107 +16,92 @@ import type { Suggestion } from '../../../core/models/suggestion.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule],
   template: `
-    <aside
-      class="fixed inset-y-0 right-0 z-40 flex w-full max-w-md flex-col bg-surface-raised shadow-2xl border-l border-slate-700 overflow-y-auto"
-    >
+    <aside class="fixed inset-y-0 right-0 z-40 flex w-full max-w-sm flex-col bg-surface-raised overflow-y-auto border-l border-slate-800 shadow-2xl">
+
       <!-- Header -->
-      <header class="flex items-center justify-between px-5 py-4 border-b border-slate-700 shrink-0">
-        <h2 class="text-sm font-semibold text-white">
-          Suggestions — paragraph {{ paragraphIndex() + 1 }}
-        </h2>
+      <header class="flex items-center justify-between px-6 py-5 border-b border-slate-800 shrink-0">
+        <div>
+          <div class="text-xs font-medium uppercase tracking-widest text-brand-secondary mb-0.5">Community Suggestions</div>
+          <div class="text-sm font-semibold text-white">Paragraph {{ paragraphIndex() + 1 }}</div>
+        </div>
         <button
-          class="p-1.5 rounded hover:bg-slate-700 text-slate-400 hover:text-white transition-colors"
+          class="flex items-center justify-center w-8 h-8 rounded-full hover:bg-slate-700 text-slate-500 hover:text-slate-200 transition-all"
           aria-label="Close suggestions panel"
           (click)="close.emit()"
-        >
-          ✕
-        </button>
+        >✕</button>
       </header>
+
+      <!-- Original text preview -->
+      <div class="mx-6 mt-4 mb-2 px-3 py-3 rounded-lg bg-slate-800 border border-slate-700">
+        <div class="text-xs text-slate-500 uppercase tracking-wider mb-1.5 font-medium">Original</div>
+        <div class="text-xs text-slate-400 leading-relaxed italic line-clamp-3">{{ originalText() }}</div>
+      </div>
 
       <!-- Loading -->
       @if (loading()) {
-        <div class="flex items-center justify-center py-12">
-          <div class="h-6 w-6 animate-spin rounded-full border-2 border-brand-primary border-t-transparent"></div>
+        <div class="flex flex-col items-center justify-center py-16 gap-3">
+          <div class="h-5 w-5 animate-spin rounded-full border-2 border-brand-primary border-t-transparent"></div>
+          <div class="text-xs text-slate-600">Loading suggestions…</div>
         </div>
-      }
-
-      <!-- Error -->
-      @else if (error()) {
-        <div class="mx-5 mt-4 rounded-lg bg-red-900/30 border border-red-700/50 px-4 py-3 text-sm text-red-400">
+      } @else if (error()) {
+        <!-- Error -->
+        <div class="mx-6 mt-4 rounded-xl bg-red-950 border border-red-800 px-4 py-3 text-sm text-red-400">
           {{ error() }}
         </div>
-      }
-
-      <!-- Suggestion list -->
-      @else {
-        <ul class="flex flex-col gap-3 px-5 py-4">
+      } @else {
+        <!-- Suggestion list -->
+        <div class="flex flex-col gap-2 px-6 py-4 flex-1">
           @for (s of suggestions(); track s.id) {
-            <li class="rounded-lg bg-slate-800/60 border border-slate-700/50 p-4">
-              <!-- Proposed text -->
-              <p class="text-sm text-slate-200 leading-relaxed mb-2">{{ s.proposedText }}</p>
-
-              <!-- Note -->
+            <div [class]="suggestionClass(s.id)">
+              <div class="text-sm text-slate-200 leading-relaxed mb-3">{{ s.proposedText }}</div>
               @if (s.note) {
-                <p class="text-xs text-slate-500 italic mb-3">{{ s.note }}</p>
+                <div class="text-xs text-slate-500 italic mb-3 pl-2 border-l border-slate-700">"{{ s.note }}"</div>
               }
-
-              <!-- Footer: author + vote -->
               <div class="flex items-center justify-between">
-                <span class="text-xs text-slate-500">by {{ s.user.username }}</span>
-
+                <span class="text-xs text-slate-600">by <span class="text-slate-400">{{ s.user.username }}</span></span>
                 <div class="flex items-center gap-2">
-                  <span class="text-xs text-slate-400">{{ s.voteCount }} votes</span>
-
+                  <span class="text-xs text-slate-400">{{ s.voteCount }} {{ s.voteCount === 1 ? 'vote' : 'votes' }}</span>
                   @if (votedIds().has(s.id)) {
-                    <!-- Unvote button -->
                     <button
-                      class="px-2.5 py-1 rounded text-xs font-medium bg-brand-primary/20 text-brand-primary border border-brand-primary/40 hover:bg-brand-primary/30 transition-colors"
+                      class="px-2.5 py-1 rounded-full text-xs font-medium bg-brand-secondary text-surface border border-brand-secondary transition-colors"
                       (click)="onUnvote(s)"
-                    >
-                      Unvote
-                    </button>
+                    >&#9650; Voted</button>
                   } @else {
-                    <!-- Vote button -->
                     <button
-                      class="px-2.5 py-1 rounded text-xs font-medium bg-slate-700 text-slate-300 hover:bg-slate-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                      class="px-2.5 py-1 rounded-full text-xs font-medium bg-slate-700 text-slate-300 border border-slate-600 hover:bg-slate-600 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                       [disabled]="!isAuthenticated()"
+                      [title]="isAuthenticated() ? '' : 'Sign in to vote'"
                       (click)="onVote(s)"
-                    >
-                      Vote
-                    </button>
+                    >&#9650; Vote</button>
                   }
                 </div>
               </div>
-            </li>
+            </div>
           } @empty {
-            @if (!loading()) {
-              <li class="py-8 text-center text-slate-500 text-sm">
-                No suggestions yet for this paragraph.
-              </li>
-            }
+            <div class="flex flex-col items-center gap-2 py-12 text-center">
+              <div class="text-slate-500 text-sm">No suggestions yet.</div>
+              <div class="text-slate-600 text-xs">Be the first to propose a correction.</div>
+            </div>
           }
-        </ul>
+        </div>
       }
 
       <!-- Suggest correction section -->
-      <div class="mt-auto border-t border-slate-700 px-5 py-4 shrink-0">
+      <div class="border-t border-slate-800 px-6 py-5 shrink-0">
         @if (isAuthenticated()) {
           @if (!showForm()) {
             <button
-              class="w-full px-4 py-2 rounded-lg bg-brand-primary text-white text-sm font-medium hover:opacity-90 transition-opacity"
+              class="w-full py-2.5 rounded-full bg-brand-primary text-white text-sm font-medium hover:opacity-90 transition-opacity"
               (click)="showForm.set(true)"
-            >
-              Suggest a correction
-            </button>
+            >+ Suggest a correction</button>
           } @else {
-            <!-- Suggestion form -->
             <form (ngSubmit)="onSubmit()" class="flex flex-col gap-3">
               <div>
-                <label class="block text-xs font-medium text-slate-400 mb-1">
-                  Proposed text <span class="text-red-400">*</span>
+                <label class="block text-xs font-medium text-slate-400 mb-1.5">
+                  Proposed text <span class="text-brand-primary">*</span>
                 </label>
                 <textarea
-                  class="w-full rounded-lg bg-slate-800 border border-slate-600 text-slate-200 text-sm px-3 py-2 focus:outline-none focus:border-brand-primary resize-none placeholder-slate-500"
+                  class="w-full rounded-xl bg-slate-800 border border-slate-700 text-slate-200 text-sm px-4 py-3 focus:outline-none focus:border-brand-primary resize-none placeholder-slate-600 transition-colors"
                   rows="4"
                   placeholder="Enter your proposed correction…"
                   [(ngModel)]="proposedText"
@@ -124,13 +109,12 @@ import type { Suggestion } from '../../../core/models/suggestion.model';
                   required
                 ></textarea>
               </div>
-
               <div>
-                <label class="block text-xs font-medium text-slate-400 mb-1">
-                  Note <span class="text-slate-500">(optional, max 500 chars)</span>
+                <label class="block text-xs font-medium text-slate-400 mb-1.5">
+                  Note <span class="text-slate-600">(optional)</span>
                 </label>
                 <input
-                  class="w-full rounded-lg bg-slate-800 border border-slate-600 text-slate-200 text-sm px-3 py-2 focus:outline-none focus:border-brand-primary placeholder-slate-500"
+                  class="w-full rounded-xl bg-slate-800 border border-slate-700 text-slate-200 text-sm px-4 py-2.5 focus:outline-none focus:border-brand-primary placeholder-slate-600 transition-colors"
                   type="text"
                   placeholder="Why this change?"
                   [(ngModel)]="noteText"
@@ -138,11 +122,10 @@ import type { Suggestion } from '../../../core/models/suggestion.model';
                   maxlength="500"
                 />
               </div>
-
-              <div class="flex gap-2">
+              <div class="flex gap-2 pt-1">
                 <button
                   type="submit"
-                  class="flex-1 px-4 py-2 rounded-lg bg-brand-primary text-white text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                  class="flex-1 py-2.5 rounded-full bg-brand-primary text-white text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
                   [disabled]="submitting() || !proposedText.trim()"
                 >
                   @if (submitting()) {
@@ -153,31 +136,26 @@ import type { Suggestion } from '../../../core/models/suggestion.model';
                 </button>
                 <button
                   type="button"
-                  class="px-4 py-2 rounded-lg bg-slate-700 text-slate-300 text-sm hover:bg-slate-600 transition-colors"
+                  class="px-5 py-2.5 rounded-full bg-slate-700 text-slate-300 text-sm hover:bg-slate-600 transition-colors border border-slate-600"
                   (click)="cancelForm()"
-                >
-                  Cancel
-                </button>
+                >Cancel</button>
               </div>
-
               @if (submitError()) {
-                <p class="text-xs text-red-400">{{ submitError() }}</p>
+                <div class="text-xs text-red-400 text-center">{{ submitError() }}</div>
               }
             </form>
           }
         } @else {
-          <p class="text-center text-xs text-slate-500">
-            <a class="text-brand-primary hover:underline" href="/login">Sign in</a> to vote or suggest corrections.
-          </p>
+          <div class="text-center text-xs text-slate-600">
+            <a class="text-brand-primary hover:underline font-medium" href="/login">Sign in</a>
+            to vote or suggest corrections.
+          </div>
         }
       </div>
     </aside>
 
     <!-- Backdrop -->
-    <div
-      class="fixed inset-0 z-30 bg-black/50"
-      (click)="close.emit()"
-    ></div>
+    <div class="fixed inset-0 z-30 bg-black/60" (click)="close.emit()"></div>
   `,
 })
 export class SuggestionPanelComponent {
@@ -294,5 +272,15 @@ export class SuggestionPanelComponent {
     this.proposedText = '';
     this.noteText = '';
     this.submitError.set(null);
+  }
+
+  suggestionClass(id: number): string {
+    const voted = this.votedIds().has(id);
+    return [
+      'rounded-xl border p-4 transition-colors',
+      voted
+        ? 'border-brand-secondary bg-slate-800'
+        : 'border-slate-700 bg-slate-800',
+    ].join(' ');
   }
 }

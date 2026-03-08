@@ -1,9 +1,19 @@
+import re
 from dataclasses import dataclass, field
 from typing import List, Optional
 
 from .author import Author
 from .genre import Genre
 from .chapter import Chapter
+
+
+def _slugify(text: str) -> str:
+    """Convert a title to a URL-friendly slug."""
+    text = text.lower().strip()
+    text = re.sub(r'[^\w\s-]', '', text)
+    text = re.sub(r'[\s_]+', '-', text)
+    text = re.sub(r'-+', '-', text)
+    return text.strip('-')
 
 
 @dataclass
@@ -16,6 +26,7 @@ class Novel:
     status: Optional[str] = None
     genres: List[Genre] = field(default_factory=list)
     chapters: List[Chapter] = field(default_factory=list)
+    slug: str = field(default='', init=False)
 
     def __post_init__(self) -> None:
         """Validate novel fields after initialization."""
@@ -25,6 +36,7 @@ class Novel:
         if not self.url or not self.url.strip():
             raise ValueError("Novel URL must not be empty")
         self.url = self.url.strip()
+        self.slug = _slugify(self.title)
 
     def add_chapter(self, chapter: Chapter) -> None:
         """Add a chapter to the novel, silently ignoring duplicates by URL.

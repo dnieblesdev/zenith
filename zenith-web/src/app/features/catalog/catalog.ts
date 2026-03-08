@@ -206,7 +206,7 @@ export class CatalogComponent {
     this.api.getNovels({ ...params, limit: this.limit }).subscribe({
       next: (res) => {
         this.novels.set(res.data);
-        this.total.set(res.total);
+        this.total.set(res.meta.total);
         this.loading.set(false);
       },
       error: () => {
