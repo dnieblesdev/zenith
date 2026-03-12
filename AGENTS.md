@@ -17,7 +17,6 @@ Contenido nativo en inglés y español. Los lectores son los editores.
 ```
 zenith/
 ├── AGENTS.md                 ← este archivo
-├── PRD.md                    ← fuente de verdad del producto
 ├── package.json              ← raíz Bun workspace
 ├── zenith-scrapper/          ← Python (subproyecto independiente)
 │   ├── AGENTS.md
