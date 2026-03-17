@@ -10,12 +10,13 @@ Contenido nativo en inglés y español. **Los lectores son los editores.**
 
 | Capa | Tecnología |
 |------|------------|
-| Scraper | Python 3.10+ (Playwright, Prisma) |
-| API | Hono.js + Bun |
-| Web | Angular 19 (Standalone, Signals, SSR) |
-| Base de datos | MariaDB 10.6+ |
+| Scraper | Python 3.10+ (Playwright, Prisma Python) |
+| API | Hono.js + Bun (TypeScript, Prisma) |
+| Web | Angular 19 + Bun (Standalone, Signals, SSR) |
+| Base de datos | MariaDB 10.6+ (Prisma ORM) |
 | Auth | Better Auth |
 | Estilos | Tailwind CSS v4 |
+| Gestor de paquetes | Bun workspaces |
 
 ---
 
