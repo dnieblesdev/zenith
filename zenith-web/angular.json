@@ -62,7 +62,14 @@
                 }
               ],
               "outputHashing": "all",
-              "optimization": true
+              "optimization": {
+                "scripts": true,
+                "styles": {
+                  "minify": true,
+                  "inlineCritical": false
+                },
+                "fonts": true
+              }
             },
             "development": {
               "optimization": false,
