@@ -1,6 +1,6 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { AuthService } from '../services/auth';
+import { AuthService } from '../../app/core/services/auth';
 
 /**
  * Functional HTTP interceptor that attaches the Bearer token

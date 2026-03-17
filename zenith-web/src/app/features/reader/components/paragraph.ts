@@ -4,7 +4,7 @@ import {
   input,
   output,
 } from '@angular/core';
-import type { Paragraph } from '../../../core/models/chapter.model';
+import type { Paragraph } from '../../../../domain/models/chapter.model';
 
 @Component({
   selector: 'app-paragraph',

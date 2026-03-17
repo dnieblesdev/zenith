@@ -1,17 +1,12 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  computed,
-  effect,
   inject,
-  signal,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { ApiService } from '../../core/services/api';
-import type { NovelSummary, NovelQueryParams } from '../../core/models/novel.model';
+import type { NovelSummary } from '../../../domain/models/novel.model';
 import { NovelCardComponent } from './components/novel-card';
-
-type LangFilter = 'all' | 'en' | 'es';
+import { CatalogData } from './catalog-data';
 
 @Component({
   selector: 'app-catalog',
@@ -26,13 +21,13 @@ type LangFilter = 'all' | 'en' | 'es';
         <div class="flex flex-wrap gap-4">
           <!-- Language filter -->
           <div class="flex gap-2">
-            @for (option of langOptions; track option.value) {
+            @for (option of data.langOptions; track option.value) {
               <button
                 class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
-                [class]="langFilter() === option.value
+                [class]="data.langFilter() === option.value
                   ? 'bg-brand-primary text-white'
                   : 'bg-surface-raised text-slate-400 hover:text-white'"
-                (click)="setLangFilter(option.value)"
+                (click)="data.setLangFilter(option.value)"
               >
                 {{ option.label }}
               </button>
@@ -44,30 +39,30 @@ type LangFilter = 'all' | 'en' | 'es';
             type="text"
             placeholder="Search novels..."
             class="flex-1 min-w-48 px-3 py-1.5 rounded-lg bg-surface-raised border border-slate-700 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-slate-500"
-            [value]="searchQuery()"
+            [value]="data.searchQuery()"
             (input)="onSearchInput($event)"
           />
         </div>
 
         <!-- Genre filter -->
-        @if (availableGenres().length > 0) {
+        @if (data.availableGenres().length > 0) {
           <div class="flex flex-wrap gap-2">
             <button
               class="px-2.5 py-1 rounded-full text-xs font-medium transition-colors"
-              [class]="genreFilter() === null
+              [class]="data.genreFilter() === null
                 ? 'bg-brand-primary/20 text-brand-primary border border-brand-primary/40'
                 : 'bg-surface-raised text-slate-400 border border-slate-700 hover:border-slate-500 hover:text-white'"
-              (click)="setGenreFilter(null)"
+              (click)="data.setGenreFilter(null)"
             >
               All genres
             </button>
-            @for (genre of availableGenres(); track genre) {
+            @for (genre of data.availableGenres(); track genre) {
               <button
                 class="px-2.5 py-1 rounded-full text-xs font-medium transition-colors"
-                [class]="genreFilter() === genre
+                [class]="data.genreFilter() === genre
                   ? 'bg-brand-primary/20 text-brand-primary border border-brand-primary/40'
                   : 'bg-surface-raised text-slate-400 border border-slate-700 hover:border-slate-500 hover:text-white'"
-                (click)="setGenreFilter(genre)"
+                (click)="data.setGenreFilter(genre)"
               >
                 {{ genre }}
               </button>
@@ -77,11 +72,11 @@ type LangFilter = 'all' | 'en' | 'es';
       </div>
 
       <!-- Loading skeleton -->
-      @if (loading()) {
+      @if (data.loading()) {
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           @for (i of skeletons; track i) {
             <div class="rounded-xl bg-surface-raised animate-pulse">
-              <div class="aspect-[2/3] bg-slate-700 rounded-t-xl"></div>
+              <div class="aspect-2/3 bg-slate-700 rounded-t-xl"></div>
               <div class="p-3 flex flex-col gap-2">
                 <div class="h-4 bg-slate-700 rounded w-3/4"></div>
                 <div class="h-3 bg-slate-700 rounded w-1/2"></div>
@@ -92,12 +87,12 @@ type LangFilter = 'all' | 'en' | 'es';
       }
 
       <!-- Error state -->
-      @else if (error()) {
+      @else if (data.error()) {
         <div class="flex flex-col items-center gap-4 py-16 text-center">
           <p class="text-slate-400">Failed to load novels.</p>
           <button
             class="px-4 py-2 rounded-lg bg-brand-primary text-white text-sm hover:opacity-90"
-            (click)="reload()"
+            (click)="data.reload()"
           >
             Retry
           </button>
@@ -105,7 +100,7 @@ type LangFilter = 'all' | 'en' | 'es';
       }
 
       <!-- Empty state -->
-      @else if (!loading() && novels().length === 0) {
+      @else if (!data.loading() && !data.hasNovels()) {
         <div class="flex flex-col items-center gap-2 py-16 text-center">
           <p class="text-slate-400">No novels found.</p>
         </div>
@@ -114,7 +109,7 @@ type LangFilter = 'all' | 'en' | 'es';
       <!-- Novel grid -->
       @else {
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          @for (novel of novels(); track novel.id) {
+          @for (novel of data.novels(); track novel.id) {
             <app-novel-card
               [novel]="novel"
               (select)="onNovelSelect($event)"
@@ -123,22 +118,22 @@ type LangFilter = 'all' | 'en' | 'es';
         </div>
 
         <!-- Pagination -->
-        @if (totalPages() > 1) {
+        @if (data.totalPages() > 1) {
           <div class="flex items-center justify-center gap-2 mt-8">
             <button
               class="px-3 py-1.5 rounded-lg bg-surface-raised text-slate-400 text-sm disabled:opacity-40"
-              [disabled]="page() === 1"
-              (click)="setPage(page() - 1)"
+              [disabled]="data.page() === 1"
+              (click)="data.setPage(data.page() - 1)"
             >
               Previous
             </button>
             <span class="text-slate-400 text-sm">
-              {{ page() }} / {{ totalPages() }}
+              {{ data.page() }} / {{ data.totalPages() }}
             </span>
             <button
               class="px-3 py-1.5 rounded-lg bg-surface-raised text-slate-400 text-sm disabled:opacity-40"
-              [disabled]="page() === totalPages()"
-              (click)="setPage(page() + 1)"
+              [disabled]="data.page() === data.totalPages()"
+              (click)="data.setPage(data.page() + 1)"
             >
               Next
             </button>
@@ -149,108 +144,17 @@ type LangFilter = 'all' | 'en' | 'es';
   `,
 })
 export class CatalogComponent {
-  private readonly api = inject(ApiService);
+  readonly data = inject(CatalogData);
   private readonly router = inject(Router);
-
-  readonly novels = signal<NovelSummary[]>([]);
-  readonly loading = signal(false);
-  readonly error = signal(false);
-  readonly total = signal(0);
-  readonly page = signal(1);
-  readonly limit = 20;
-  readonly langFilter = signal<LangFilter>('all');
-  readonly searchQuery = signal('');
-  readonly genreFilter = signal<string | null>(null);
-
-  readonly totalPages = computed(() => Math.max(1, Math.ceil(this.total() / this.limit)));
-
-  /** Derives unique genre names from currently loaded novels — no extra API call needed. */
-  readonly availableGenres = computed(() => {
-    const seen = new Set<string>();
-    for (const novel of this.novels()) {
-      for (const g of novel.genres) seen.add(g.name);
-    }
-    return Array.from(seen).sort();
-  });
-
-  readonly langOptions: { value: LangFilter; label: string }[] = [
-    { value: 'all', label: 'All' },
-    { value: 'en', label: 'EN' },
-    { value: 'es', label: 'ES' },
-  ];
 
   readonly skeletons = Array.from({ length: 10 }, (_, i) => i);
 
-  private searchTimer: ReturnType<typeof setTimeout> | null = null;
-
-  constructor() {
-    effect(() => {
-      // Re-fetch whenever filter/page/search changes
-      const lang = this.langFilter();
-      const q = this.searchQuery();
-      const currentPage = this.page();
-      const genre = this.genreFilter();
-      this.fetchNovels({
-        lang: lang === 'all' ? undefined : lang,
-        q: q || undefined,
-        genre: genre ?? undefined,
-        page: currentPage,
-      });
-    });
-  }
-
-  private fetchNovels(params: NovelQueryParams) {
-    this.loading.set(true);
-    this.error.set(false);
-
-    this.api.getNovels({ ...params, limit: this.limit }).subscribe({
-      next: (res) => {
-        this.novels.set(res.data);
-        this.total.set(res.meta.total);
-        this.loading.set(false);
-      },
-      error: () => {
-        this.error.set(true);
-        this.loading.set(false);
-      },
-    });
-  }
-
-  setLangFilter(lang: LangFilter) {
-    this.langFilter.set(lang);
-    this.page.set(1);
-  }
-
-  setGenreFilter(genre: string | null) {
-    this.genreFilter.set(genre);
-    this.page.set(1);
-  }
-
-  setPage(p: number) {
-    this.page.set(p);
-  }
-
   onSearchInput(event: Event) {
     const value = (event.target as HTMLInputElement).value;
-    if (this.searchTimer) clearTimeout(this.searchTimer);
-    this.searchTimer = setTimeout(() => {
-      this.searchQuery.set(value);
-      this.page.set(1);
-    }, 300);
+    this.data.onSearchInput(value);
   }
 
   onNovelSelect(novel: NovelSummary) {
-    this.router.navigate(['/novels', novel.slug]);
-  }
-
-  reload() {
-    const lang = this.langFilter();
-    this.fetchNovels({
-      lang: lang === 'all' ? undefined : lang,
-      q: this.searchQuery() || undefined,
-      genre: this.genreFilter() ?? undefined,
-      page: this.page(),
-      limit: this.limit,
-    });
+    this.router.navigate(['/novels', novel.id]);
   }
 }

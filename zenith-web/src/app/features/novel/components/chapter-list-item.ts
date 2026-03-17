@@ -5,7 +5,7 @@ import {
   output,
 } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
-import type { Chapter } from '../../../core/models/chapter.model';
+import type { Chapter } from '../../../../domain/models/chapter.model';
 
 @Component({
   selector: 'app-chapter-list-item',

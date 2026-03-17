@@ -4,14 +4,12 @@ import {
   effect,
   inject,
   input,
-  signal,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
-import { ApiService } from '../../core/services/api';
-import type { Novel } from '../../core/models/novel.model';
-import type { Chapter } from '../../core/models/chapter.model';
+import type { Chapter } from '../../../domain/models/chapter.model';
 import { ChapterListItemComponent } from './components/chapter-list-item';
+import { NovelData } from './novel-data';
 
 @Component({
   selector: 'app-novel',
@@ -21,7 +19,7 @@ import { ChapterListItemComponent } from './components/chapter-list-item';
     <section class="max-w-4xl mx-auto px-4 py-8">
 
       <!-- Loading -->
-      @if (loading()) {
+      @if (data.loading()) {
         <div class="animate-pulse flex flex-col gap-6">
           <div class="flex gap-6">
             <div class="w-36 h-52 bg-slate-700 rounded-xl shrink-0"></div>
@@ -35,7 +33,7 @@ import { ChapterListItemComponent } from './components/chapter-list-item';
       }
 
       <!-- Error -->
-      @else if (error()) {
+      @else if (data.error()) {
         <div class="flex flex-col items-center gap-4 py-16 text-center">
           <p class="text-slate-400">Failed to load novel.</p>
           <button
@@ -48,15 +46,15 @@ import { ChapterListItemComponent } from './components/chapter-list-item';
       }
 
       <!-- Content -->
-      @else if (novel()) {
+      @else if (data.novel()) {
         <!-- Hero -->
         <div class="flex flex-col sm:flex-row gap-6 mb-8">
           <!-- Cover -->
           <div class="shrink-0">
-            @if (novel()!.coverUrl) {
+            @if (data.novel()!.coverUrl) {
               <img
-                [src]="novel()!.coverUrl"
-                [alt]="novel()!.title"
+                [src]="data.novel()!.coverUrl"
+                [alt]="data.novel()!.title"
                 class="w-36 h-52 object-cover rounded-xl border border-slate-700"
               />
             } @else {
@@ -68,40 +66,40 @@ import { ChapterListItemComponent } from './components/chapter-list-item';
 
           <!-- Meta -->
           <div class="flex flex-col gap-3">
-            <h1 class="text-2xl font-bold text-white">{{ novel()!.title }}</h1>
+            <h1 class="text-2xl font-bold text-white">{{ data.novel()!.title }}</h1>
 
-            @if (novel()!.author) {
-              <p class="text-slate-400 text-sm">by {{ novel()!.author!.name }}</p>
+            @if (data.novel()!.author) {
+              <p class="text-slate-400 text-sm">by {{ data.novel()!.author!.name }}</p>
             }
 
             <!-- Badges row -->
             <div class="flex flex-wrap gap-2 items-center">
               <span class="px-2 py-0.5 rounded text-xs font-semibold uppercase tracking-wide bg-slate-700 text-slate-300">
-                {{ novel()!.language }}
+                {{ data.novel()!.language }}
               </span>
 
-              @if (novel()!.status) {
+              @if (data.novel()!.status) {
                 <span
                   class="px-2 py-0.5 rounded text-xs font-medium"
-                  [class]="statusClass(novel()!.status)"
+                  [class]="statusClass(data.novel()!.status)"
                 >
-                  {{ novel()!.status }}
+                  {{ data.novel()!.status }}
                 </span>
               }
 
               <span class="text-xs text-slate-500">
-                {{ novel()!.reads | number }} reads
+                {{ data.novel()!.reads | number }} reads
               </span>
 
               <span class="text-xs text-slate-500">
-                {{ novel()!.chapterCount }} chapters
+                {{ data.novel()!.chapterCount }} chapters
               </span>
             </div>
 
             <!-- Genres -->
-            @if (novel()!.genres.length > 0) {
+            @if (data.novel()!.genres.length > 0) {
               <div class="flex flex-wrap gap-1.5">
-                @for (genre of novel()!.genres; track genre.id) {
+                @for (genre of data.novel()!.genres; track genre.id) {
                   <span class="px-2 py-0.5 rounded-full text-xs bg-slate-700 text-slate-300">
                     {{ genre.name }}
                   </span>
@@ -110,9 +108,9 @@ import { ChapterListItemComponent } from './components/chapter-list-item';
             }
 
             <!-- Description -->
-            @if (novel()!.description) {
+            @if (data.novel()!.description) {
               <p class="text-sm text-slate-400 leading-relaxed line-clamp-4">
-                {{ novel()!.description }}
+                {{ data.novel()!.description }}
               </p>
             }
           </div>
@@ -122,17 +120,17 @@ import { ChapterListItemComponent } from './components/chapter-list-item';
         <div>
           <h2 class="text-lg font-semibold text-white mb-4">Chapters</h2>
 
-          @if (chaptersLoading()) {
+          @if (data.chaptersLoading()) {
             <div class="space-y-2">
               @for (i of skeletons; track i) {
                 <div class="h-14 rounded-lg bg-surface-raised animate-pulse"></div>
               }
             </div>
-          } @else if (chapters().length === 0) {
+          } @else if (!data.hasChapters()) {
             <p class="text-slate-500 text-sm">No chapters available yet.</p>
           } @else {
             <ul class="flex flex-col gap-2">
-              @for (chapter of chapters(); track chapter.id) {
+              @for (chapter of data.chapters(); track chapter.id) {
                 <app-chapter-list-item
                   [chapter]="chapter"
                   (select)="onChapterSelect($event)"
@@ -148,64 +146,26 @@ import { ChapterListItemComponent } from './components/chapter-list-item';
 })
 export class NovelComponent {
   // Route param bound via withComponentInputBinding()
-  readonly slug = input.required<string>();
+  readonly id = input.required<string>();
 
-  private readonly api = inject(ApiService);
+  readonly data = inject(NovelData);
   private readonly router = inject(Router);
-
-  readonly novel = signal<Novel | null>(null);
-  readonly chapters = signal<Chapter[]>([]);
-  readonly loading = signal(false);
-  readonly chaptersLoading = signal(false);
-  readonly error = signal(false);
 
   readonly skeletons = Array.from({ length: 5 }, (_, i) => i);
 
   constructor() {
     effect(() => {
-      const slug = this.slug();
-      this.fetchNovel(slug);
-    });
-  }
-
-  private fetchNovel(slug: string) {
-    this.loading.set(true);
-    this.error.set(false);
-    this.novel.set(null);
-    this.chapters.set([]);
-
-    this.api.getNovel(slug).subscribe({
-      next: (novel) => {
-        this.novel.set(novel);
-        this.loading.set(false);
-        this.fetchChapters(slug);
-      },
-      error: () => {
-        this.error.set(true);
-        this.loading.set(false);
-      },
-    });
-  }
-
-  private fetchChapters(novelSlug: string) {
-    this.chaptersLoading.set(true);
-    this.api.getChapters(novelSlug).subscribe({
-      next: (chapters) => {
-        this.chapters.set(chapters);
-        this.chaptersLoading.set(false);
-      },
-      error: () => {
-        this.chaptersLoading.set(false);
-      },
+      const id = this.id();
+      this.data.load(Number(id));
     });
   }
 
   onChapterSelect(chapter: Chapter) {
-    this.router.navigate(['/novels', this.slug(), chapter.id]);
+    this.router.navigate(['/novels', this.id(), chapter.id]);
   }
 
   reload() {
-    this.fetchNovel(this.slug());
+    this.data.load(Number(this.id()));
   }
 
   statusClass(status: string | null): string {

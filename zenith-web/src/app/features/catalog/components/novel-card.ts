@@ -5,7 +5,7 @@ import {
   output,
 } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
-import type { NovelSummary } from '../../../core/models/novel.model';
+import type { NovelSummary } from '../../../../domain/models/novel.model';
 
 @Component({
   selector: 'app-novel-card',
@@ -17,7 +17,7 @@ import type { NovelSummary } from '../../../core/models/novel.model';
       (click)="select.emit(novel())"
     >
       <!-- Cover image -->
-      <div class="relative aspect-[2/3] bg-slate-800 overflow-hidden">
+      <div class="relative aspect-2/3 bg-slate-800 overflow-hidden">
         @if (novel().coverUrl) {
           <img
             [src]="novel().coverUrl"

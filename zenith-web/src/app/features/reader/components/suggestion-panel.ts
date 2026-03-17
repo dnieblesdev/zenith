@@ -8,8 +8,8 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ApiService } from '../../../core/services/api';
-import type { Suggestion } from '../../../core/models/suggestion.model';
+import type { Suggestion } from '../../../../domain/models/suggestion.model';
+import { ReaderData } from '../reader-data';
 
 @Component({
   selector: 'app-suggestion-panel',
@@ -166,7 +166,7 @@ export class SuggestionPanelComponent {
 
   readonly close = output<void>();
 
-  private readonly api = inject(ApiService);
+  private readonly data = inject(ReaderData);
 
   readonly suggestions = signal<Suggestion[]>([]);
   readonly loading = signal(false);
@@ -194,9 +194,9 @@ export class SuggestionPanelComponent {
     this.error.set(null);
     this.suggestions.set([]);
 
-    this.api.getSuggestions(chapterId, paragraphIndex).subscribe({
-      next: (response) => {
-        this.suggestions.set(response.data);
+    this.data.getSuggestions(chapterId, paragraphIndex).subscribe({
+      next: (suggestions) => {
+        this.suggestions.set(suggestions);
         this.loading.set(false);
       },
       error: () => {
@@ -207,7 +207,7 @@ export class SuggestionPanelComponent {
   }
 
   onVote(suggestion: Suggestion): void {
-    this.api.voteSuggestion(suggestion.id).subscribe({
+    this.data.voteSuggestion(suggestion.id).subscribe({
       next: () => {
         // Optimistic update: increment voteCount + track voted id
         this.suggestions.update((list) =>
@@ -221,7 +221,7 @@ export class SuggestionPanelComponent {
   }
 
   onUnvote(suggestion: Suggestion): void {
-    this.api.unvoteSuggestion(suggestion.id).subscribe({
+    this.data.unvoteSuggestion(suggestion.id).subscribe({
       next: () => {
         // Optimistic update: decrement voteCount + remove from voted ids
         this.suggestions.update((list) =>
@@ -245,7 +245,7 @@ export class SuggestionPanelComponent {
     this.submitting.set(true);
     this.submitError.set(null);
 
-    this.api
+    this.data
       .createSuggestion({
         chapterId: this.chapterId(),
         paragraphIndex: this.paragraphIndex(),

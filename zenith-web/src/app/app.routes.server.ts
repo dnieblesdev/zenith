@@ -8,8 +8,8 @@ export const serverRoutes: ServerRoute[] = [
   { path: 'novels', renderMode: RenderMode.Server },
 
   // Dynamic routes — render on each server request
-  { path: 'novels/:slug', renderMode: RenderMode.Server },
-  { path: 'novels/:slug/:chapter', renderMode: RenderMode.Server },
+  { path: 'novels/:id', renderMode: RenderMode.Server },
+  { path: 'novels/:id/:chapterId', renderMode: RenderMode.Server },
   { path: 'users/:username', renderMode: RenderMode.Server },
 
   // Protected route — render on client only (authGuard needs browser)

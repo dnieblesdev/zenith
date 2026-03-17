@@ -4,15 +4,14 @@
 // ---------------------------------------------------------------------------
 
 // Services
-export { ApiService } from './services/api';
 export { AuthService } from './services/auth';
 export type { AuthUser } from './services/auth';
 
 // Guards
-export { authGuard } from './guards/auth';
+export { authGuard } from '../../adapters/guards/auth';
 
 // Interceptors
-export { authInterceptor } from './interceptors/auth';
+export { authInterceptor } from '../../adapters/interceptors/auth';
 
 // Models — Novel domain
 export type {
@@ -22,13 +21,13 @@ export type {
   NovelSummary,
   NovelQueryParams,
   PaginatedResponse,
-} from './models/novel.model';
+} from '../../domain/models/novel.model';
 
 // Models — Chapter domain
-export type { Chapter, ChapterDetail, Paragraph } from './models/chapter.model';
+export type { Chapter, ChapterDetail, Paragraph } from '../../domain/models/chapter.model';
 
 // Models — User domain
-export type { User, UserSummary, UserRole } from './models/user.model';
+export type { User, UserSummary, UserRole } from '../../domain/models/user.model';
 
 // Models — Editorial domain
 export type {
@@ -36,4 +35,4 @@ export type {
   SuggestionStatus,
   Vote,
   Correction,
-} from './models/suggestion.model';
+} from '../../domain/models/suggestion.model';

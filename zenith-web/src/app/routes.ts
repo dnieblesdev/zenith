@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard } from './core/guards/auth';
+import { authGuard } from '../adapters/guards/auth';
 
 export const routes: Routes = [
   {
@@ -16,13 +16,13 @@ export const routes: Routes = [
   },
   {
     // WB-003 — Novel detail
-    path: 'novels/:slug',
+    path: 'novels/:id',
     loadComponent: () =>
       import('./features/novel/novel').then((m) => m.NovelComponent),
   },
   {
     // WB-004 — Chapter reader
-    path: 'novels/:slug/:chapter',
+    path: 'novels/:id/:chapterId',
     loadComponent: () =>
       import('./features/reader/reader').then((m) => m.ReaderComponent),
   },
