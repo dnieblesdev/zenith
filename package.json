@@ -2,12 +2,20 @@
   "name": "zenith",
   "version": "0.0.0",
   "private": true,
-  "workspaces": ["zenith-api", "zenith-web"],
+  "workspaces": [
+    "zenith-api",
+    "zenith-web"
+  ],
   "scripts": {
     "dev": "bunx kill-port 3000 4200 5300 && bun run --filter '*' dev",
     "build": "bun run --filter '*' build",
     "test": "bun run --filter '*' test",
     "typecheck": "bun run --filter '*' typecheck",
     "kill-ports": "bunx kill-port 3000 5300"
+  },
+  "devDependencies": {
+    "@angular/compiler-cli": "^21.2.4",
+    "@angular/language-service": "^21.2.4",
+    "typescript": "^5.9.3"
   }
 }

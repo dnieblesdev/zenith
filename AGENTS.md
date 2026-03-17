@@ -23,7 +23,7 @@ zenith/
 │   └── prisma/schema.prisma  ← source of truth del schema Prisma
 ├── zenith-api/               ← Hono.js + Bun (workspace)
 │   └── AGENTS.md
-└── zenith-web/               ← Angular 19 + Bun (workspace)
+└── zenith-web/               ← Angular 21 + Bun (workspace)
     └── AGENTS.md
 ```
 
@@ -37,7 +37,7 @@ El workspace Bun gestiona `zenith-api` y `zenith-web`. El scrapper Python es ind
 |-------------------|-----------------------|--------------------------------------------|
 | Scraper           | Python 3.10+          | Playwright, Prisma Python                  |
 | API               | Hono.js + Bun         | TypeScript, Prisma TS                      |
-| Web               | Angular 19 + Bun      | Standalone, Signals, SSR (Angular Universal) |
+| Web               | Angular 21 + Bun      | Standalone, Signals, Zoneless, SSR (Angular Universal) |
 | Base de datos     | MariaDB 10.6+         | Schema compartido vía Prisma               |
 | Auth              | Better Auth           | Compatible con Hono + Angular              |
 | Estilos           | Tailwind CSS v4       | Utility-first                              |

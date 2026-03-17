@@ -14,7 +14,7 @@ Interfaz web principal de Zenith. Lectura de novelas, sistema editorial (sugeren
 
 | Herramienta | Uso |
 |-------------|-----|
-| Angular 19 | Framework — standalone components, signals, zoneless |
+| Angular 21 | Framework — standalone components, signals, zoneless |
 | Angular Universal | SSR para SEO y carga inicial rápida |
 | Angular Router | Enrutamiento con lazy loading por feature |
 | Bun | Runtime y gestor de paquetes |
@@ -106,7 +106,7 @@ bunx tsc --noEmit
 ### Componentes standalone (no poner `standalone: true`)
 
 ```typescript
-// Angular 19: standalone ES EL DEFAULT — no declarar la propiedad
+// Angular 21: standalone ES EL DEFAULT — no declarar la propiedad
 @Component({
   selector: 'app-reader',
   imports: [NgIf, AsyncPipe],

@@ -1,7 +1,7 @@
 import { RenderMode, ServerRoute } from '@angular/ssr';
 
 export const serverRoutes: ServerRoute[] = [
-  // Static routes — SSR (workaround: Prerender + zoneless causes NG0401 in Angular 19.2.x)
+  // Static routes — SSR (workaround: Prerender + zoneless causes NG0401 in certain Angular versions)
   { path: '', renderMode: RenderMode.Server },
   { path: 'login', renderMode: RenderMode.Server },
   { path: 'register', renderMode: RenderMode.Server },
