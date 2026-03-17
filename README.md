@@ -12,7 +12,7 @@ Contenido nativo en inglés y español. **Los lectores son los editores.**
 |------|------------|
 | Scraper | Python 3.10+ (Playwright, Prisma Python) |
 | API | Hono.js + Bun (TypeScript, Prisma) |
-| Web | Angular 19 + Bun (Standalone, Signals, SSR) |
+| Web | Angular 19 + Bun (Standalone, Signals, Zoneless, SSR) |
 | Base de datos | MariaDB 10.6+ (Prisma ORM) |
 | Auth | Better Auth |
 | Estilos | Tailwind CSS v4 |
