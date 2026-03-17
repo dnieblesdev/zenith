@@ -1,0 +1,17 @@
+{
+  "lsp": {
+    "angular": {
+      "binary": {
+        "path": "node",
+        "arguments": [
+          "zenith-web/node_modules/@angular/language-server/bin/ngserver",
+          "--stdio",
+          "--tsProbeLocations",
+          "zenith-web/node_modules",
+          "--ngProbeLocations",
+          "zenith-web/node_modules"
+        ]
+      },
+    },
+  },
+}

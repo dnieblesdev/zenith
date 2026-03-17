@@ -18,6 +18,7 @@ bun.lockb
 # Python client (prisma-client-py output → zenith-scrapper/src/prisma/)
 zenith-scrapper/src/prisma/
 zenith-api/node_modules/.prisma/
+zenith-api/src/generated/
 **/node_modules/.prisma/
 
 # Angular build output
