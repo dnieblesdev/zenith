@@ -74,10 +74,10 @@ function makeChapterRow(overrides: Record<string, unknown> = {}) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// AP-001 — GET /novels
+// AP-001 — GET /api/novels
 // ─────────────────────────────────────────────────────────────────────────────
 
-describe('AP-001 GET /novels', () => {
+describe('AP-001 GET /api/novels', () => {
   beforeEach(() => {
     vi.resetAllMocks()
   })
@@ -86,7 +86,7 @@ describe('AP-001 GET /novels', () => {
     const mockNovel = makeNovelRow()
     vi.mocked(db.$transaction).mockResolvedValueOnce([[mockNovel], 1])
 
-    const res = await app.request('/novels')
+    const res = await app.request('/api/novels')
 
     expect(res.status).toBe(200)
     const body = await res.json()
@@ -101,7 +101,7 @@ describe('AP-001 GET /novels', () => {
     const mockNovel = makeNovelRow()
     vi.mocked(db.$transaction).mockResolvedValueOnce([[mockNovel], 1])
 
-    const res = await app.request('/novels')
+    const res = await app.request('/api/novels')
     const body = await res.json()
 
     expect(body.data[0].genres).toEqual(['Fantasy', 'Action'])
@@ -111,7 +111,7 @@ describe('AP-001 GET /novels', () => {
     const mockNovel = makeNovelRow({ _count: { chapters: 42 } })
     vi.mocked(db.$transaction).mockResolvedValueOnce([[mockNovel], 1])
 
-    const res = await app.request('/novels')
+    const res = await app.request('/api/novels')
     const body = await res.json()
 
     expect(body.data[0].chapterCount).toBe(42)
@@ -120,7 +120,7 @@ describe('AP-001 GET /novels', () => {
   it('filters by lang', async () => {
     vi.mocked(db.$transaction).mockResolvedValueOnce([[], 0])
 
-    const res = await app.request('/novels?lang=es')
+    const res = await app.request('/api/novels?lang=es')
 
     expect(res.status).toBe(200)
     // Verify transaction was called (filters applied by service)
@@ -130,7 +130,7 @@ describe('AP-001 GET /novels', () => {
   it('filters by genre', async () => {
     vi.mocked(db.$transaction).mockResolvedValueOnce([[], 0])
 
-    const res = await app.request('/novels?genre=Fantasy')
+    const res = await app.request('/api/novels?genre=Fantasy')
 
     expect(res.status).toBe(200)
     expect(vi.mocked(db.$transaction)).toHaveBeenCalledOnce()
@@ -139,7 +139,7 @@ describe('AP-001 GET /novels', () => {
   it('filters by status', async () => {
     vi.mocked(db.$transaction).mockResolvedValueOnce([[], 0])
 
-    const res = await app.request('/novels?status=ongoing')
+    const res = await app.request('/api/novels?status=ongoing')
 
     expect(res.status).toBe(200)
   })
@@ -147,7 +147,7 @@ describe('AP-001 GET /novels', () => {
   it('filters by q (title search)', async () => {
     vi.mocked(db.$transaction).mockResolvedValueOnce([[], 0])
 
-    const res = await app.request('/novels?q=sword')
+    const res = await app.request('/api/novels?q=sword')
 
     expect(res.status).toBe(200)
   })
@@ -155,7 +155,7 @@ describe('AP-001 GET /novels', () => {
   it('supports pagination params', async () => {
     vi.mocked(db.$transaction).mockResolvedValueOnce([[], 0])
 
-    const res = await app.request('/novels?page=2&limit=10')
+    const res = await app.request('/api/novels?page=2&limit=10')
     const body = await res.json()
 
     expect(res.status).toBe(200)
@@ -164,26 +164,26 @@ describe('AP-001 GET /novels', () => {
   })
 
   it('returns 400 for invalid lang', async () => {
-    const res = await app.request('/novels?lang=fr')
+    const res = await app.request('/api/novels?lang=fr')
     expect(res.status).toBe(400)
   })
 
   it('returns 400 for limit > 100', async () => {
-    const res = await app.request('/novels?limit=200')
+    const res = await app.request('/api/novels?limit=200')
     expect(res.status).toBe(400)
   })
 
   it('returns 400 for page < 1', async () => {
-    const res = await app.request('/novels?page=0')
+    const res = await app.request('/api/novels?page=0')
     expect(res.status).toBe(400)
   })
 })
 
 // ─────────────────────────────────────────────────────────────────────────────
-// AP-002 — GET /novels/:id
+// AP-002 — GET /api/novels/:id
 // ─────────────────────────────────────────────────────────────────────────────
 
-describe('AP-002 GET /novels/:id', () => {
+describe('AP-002 GET /api/novels/:id', () => {
   beforeEach(() => {
     vi.resetAllMocks()
   })
@@ -192,7 +192,7 @@ describe('AP-002 GET /novels/:id', () => {
     const mockNovel = makeNovelRow()
     vi.mocked(db.novel.findUniqueOrThrow).mockResolvedValueOnce(mockNovel as never)
 
-    const res = await app.request('/novels/1')
+    const res = await app.request('/api/novels/1')
 
     expect(res.status).toBe(200)
     const body = await res.json()
@@ -210,16 +210,23 @@ describe('AP-002 GET /novels/:id', () => {
       new Error('Record not found'),
     )
 
-    const res = await app.request('/novels/99999')
+    const res = await app.request('/api/novels/99999')
 
     expect(res.status).toBe(404)
+  })
+
+  it('returns 400 for non-numeric string id ("abc")', async () => {
+    // z.coerce.number() rejects non-numeric strings
+    const res = await app.request('/api/novels/abc')
+
+    expect(res.status).toBe(400)
   })
 
   it('returns null author when author is null', async () => {
     const mockNovel = makeNovelRow({ author: null, authorId: null })
     vi.mocked(db.novel.findUniqueOrThrow).mockResolvedValueOnce(mockNovel as never)
 
-    const res = await app.request('/novels/1')
+    const res = await app.request('/api/novels/1')
     const body = await res.json()
 
     expect(body.data.author).toBeNull()
@@ -229,7 +236,7 @@ describe('AP-002 GET /novels/:id', () => {
     const mockNovel = makeNovelRow({ _count: { chapters: 7 } })
     vi.mocked(db.novel.findUniqueOrThrow).mockResolvedValueOnce(mockNovel as never)
 
-    const res = await app.request('/novels/1')
+    const res = await app.request('/api/novels/1')
     const body = await res.json()
 
     expect(body.data.chapterCount).toBe(7)
@@ -237,10 +244,10 @@ describe('AP-002 GET /novels/:id', () => {
 })
 
 // ─────────────────────────────────────────────────────────────────────────────
-// AP-003 — GET /novels/:id/chapters
+// AP-003 — GET /api/novels/:id/chapters
 // ─────────────────────────────────────────────────────────────────────────────
 
-describe('AP-003 GET /novels/:id/chapters', () => {
+describe('AP-003 GET /api/novels/:id/chapters', () => {
   beforeEach(() => {
     vi.resetAllMocks()
   })
@@ -268,13 +275,20 @@ describe('AP-003 GET /novels/:id/chapters', () => {
       },
     ] as never)
 
-    const res = await app.request('/novels/1/chapters')
+    const res = await app.request('/api/novels/1/chapters')
 
     expect(res.status).toBe(200)
     const body = await res.json()
     expect(body.data).toHaveLength(2)
     expect(body.data[0].orderIndex).toBe(1)
     expect(body.data[1].orderIndex).toBe(2)
+  })
+
+  it('returns 400 for non-numeric string id ("abc")', async () => {
+    // z.coerce.number() rejects non-numeric strings
+    const res = await app.request('/api/novels/abc/chapters')
+
+    expect(res.status).toBe(400)
   })
 
   it('does NOT include content field in chapter list', async () => {
@@ -291,7 +305,7 @@ describe('AP-003 GET /novels/:id/chapters', () => {
       },
     ] as never)
 
-    const res = await app.request('/novels/1/chapters')
+    const res = await app.request('/api/novels/1/chapters')
     const body = await res.json()
 
     expect(body.data[0]).not.toHaveProperty('content')
@@ -302,7 +316,7 @@ describe('AP-003 GET /novels/:id/chapters', () => {
       new Error('Record not found'),
     )
 
-    const res = await app.request('/novels/99999/chapters')
+    const res = await app.request('/api/novels/99999/chapters')
 
     expect(res.status).toBe(404)
   })
@@ -321,7 +335,7 @@ describe('AP-003 GET /novels/:id/chapters', () => {
       },
     ] as never)
 
-    const res = await app.request('/novels/1/chapters')
+    const res = await app.request('/api/novels/1/chapters')
     const body = await res.json()
 
     expect(body.meta.total).toBe(1)
@@ -342,7 +356,7 @@ describe('AP-004 GET /chapters/:id', () => {
     const mockChapter = makeChapterRow()
     vi.mocked(db.chapter.findUniqueOrThrow).mockResolvedValueOnce(mockChapter as never)
 
-    const res = await app.request('/chapters/1')
+    const res = await app.request('/api/chapters/1')
 
     expect(res.status).toBe(200)
     const body = await res.json()
@@ -369,7 +383,7 @@ describe('AP-004 GET /chapters/:id', () => {
     })
     vi.mocked(db.chapter.findUniqueOrThrow).mockResolvedValueOnce(mockChapter as never)
 
-    const res = await app.request('/chapters/1')
+    const res = await app.request('/api/chapters/1')
     const body = await res.json()
 
     expect(body.data.paragraphs[0].text).toBe('First paragraph.')
@@ -407,7 +421,7 @@ describe('AP-004 GET /chapters/:id', () => {
     const mockChapter = makeChapterRow({ content: null, corrections: [] })
     vi.mocked(db.chapter.findUniqueOrThrow).mockResolvedValueOnce(mockChapter as never)
 
-    const res = await app.request('/chapters/1')
+    const res = await app.request('/api/chapters/1')
     const body = await res.json()
 
     expect(body.data.contentAvailable).toBe(false)
@@ -419,7 +433,7 @@ describe('AP-004 GET /chapters/:id', () => {
       new Error('Record not found'),
     )
 
-    const res = await app.request('/chapters/99999')
+    const res = await app.request('/api/chapters/99999')
 
     expect(res.status).toBe(404)
   })
@@ -428,7 +442,7 @@ describe('AP-004 GET /chapters/:id', () => {
     const mockChapter = makeChapterRow()
     vi.mocked(db.chapter.findUniqueOrThrow).mockResolvedValueOnce(mockChapter as never)
 
-    const res = await app.request('/chapters/1')
+    const res = await app.request('/api/chapters/1')
 
     // Response returns successfully regardless of reads update
     expect(res.status).toBe(200)
@@ -443,7 +457,7 @@ describe('AP-004 GET /chapters/:id', () => {
     const mockChapter = makeChapterRow()
     vi.mocked(db.chapter.findUniqueOrThrow).mockResolvedValueOnce(mockChapter as never)
 
-    const res = await app.request('/chapters/1')
+    const res = await app.request('/api/chapters/1')
     const body = await res.json()
 
     for (const para of body.data.paragraphs) {

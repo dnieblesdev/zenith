@@ -145,11 +145,11 @@ export async function listNovels(
 // AP-002 — getNovel
 // ─────────────────────────────────────────────────────────────────────────────
 
-export async function getNovel(slug: string): Promise<SingleResponse<NovelDetail>> {
+export async function getNovel(id: number): Promise<SingleResponse<NovelDetail>> {
   let novel: NovelDetailRow
   try {
     novel = (await db.novel.findUniqueOrThrow({
-      where: { slug },
+      where: { id },
       include: {
         author: { select: { id: true, name: true, description: true } },
         genres: { include: { genre: { select: { id: true, name: true } } } },
@@ -193,16 +193,14 @@ export async function getNovel(slug: string): Promise<SingleResponse<NovelDetail
 // ─────────────────────────────────────────────────────────────────────────────
 
 export async function listChapters(
-  novelSlug: string,
+  novelId: number,
 ): Promise<ListResponse<ChapterListItem>> {
   // Verify novel exists first
-  let novelId: number
   try {
-    const novel = await db.novel.findUniqueOrThrow({
-      where: { slug: novelSlug },
+    await db.novel.findUniqueOrThrow({
+      where: { id: novelId },
       select: { id: true },
     })
-    novelId = novel.id
   } catch {
     throw notFound('Novel not found')
   }
