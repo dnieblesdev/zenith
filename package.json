@@ -4,7 +4,8 @@
   "private": true,
   "workspaces": [
     "zenith-api",
-    "zenith-web"
+    "zenith-web",
+    "zenith-scrapper"
   ],
   "scripts": {
     "dev": "bunx kill-port 3000 4200 5300 && bun run --filter '*' dev",
